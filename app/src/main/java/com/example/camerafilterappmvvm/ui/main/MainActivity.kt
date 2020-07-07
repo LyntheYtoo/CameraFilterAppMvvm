@@ -28,9 +28,11 @@ class MainActivity : AppCompatActivity() {
         cameraPreviewCallback = viewModel.createCameraPreviewCallback(this, preview_camera.holder.surface)
 
         // 퍼미션 체크
-        if(!checkPermissions(this, NECESSARY_PERMISSIONS))
-            askPermissions(this, NECESSARY_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        else preview_camera.holder.addCallback(cameraPreviewCallback)
+        if(checkPermissions(this, NECESSARY_PERMISSIONS))
+            // 체크가 통과되면 서피스뷰에 카메라 관련 콜백을 붙임
+            preview_camera.holder.addCallback(cameraPreviewCallback)
+            // 체크가 실패하면 퍼미션 요청
+        else askPermissions(this, NECESSARY_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
 
         // Hide the status bar
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
