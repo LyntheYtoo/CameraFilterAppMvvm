@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.MainActivity"
+
+    android:id="@+id/fl_camera"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="1.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="1.0">
+
+    <!--  카메라가 표시될 뷰  -->
+    <SurfaceView
+        android:id="@+id/preview_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|fill_vertical"/>
+
+    <!--   캡처 버튼     -->
+    <Button
+        android:id="@+id/btn_capture"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="end|center_vertical"
+        android:background="@drawable/ic_open" />
+    <!--   갤러리 버튼     -->
+    <Button
+        android:id="@+id/btn_gallery"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/ic_gallary"/>
+    <!--    옵션 버튼    -->
+    <Button
+        android:id="@+id/btn_option"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top|end"
+        android:background="@drawable/ic_settings"/>
+
+</FrameLayout>
