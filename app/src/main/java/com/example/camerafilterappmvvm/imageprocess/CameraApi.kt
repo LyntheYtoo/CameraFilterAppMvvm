@@ -1,4 +1,4 @@
-package com.example.camerafilterappmvvm.imageProcess
+package com.example.camerafilterappmvvm.imageprocess
 
 import android.annotation.SuppressLint
 import android.content.Context

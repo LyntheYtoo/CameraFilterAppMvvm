@@ -6,10 +6,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import com.example.camerafilterappmvvm.R
-import com.example.camerafilterappmvvm.imageProcess.CameraApi
-import com.example.camerafilterappmvvm.model.CameraParams
 import com.example.camerafilterappmvvm.util.askPermissions
 import com.example.camerafilterappmvvm.util.checkPermissions
 import com.example.camerafilterappmvvm.util.showToast
@@ -67,11 +64,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        val TAG = "MainActivity"
+        const val TAG = "MainActivity"
+        const val REQUEST_CODE_PERMISSIONS = 10
+
         val NECESSARY_PERMISSIONS = listOf(
             Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO)
-        val REQUEST_CODE_PERMISSIONS = 10
     }
 }

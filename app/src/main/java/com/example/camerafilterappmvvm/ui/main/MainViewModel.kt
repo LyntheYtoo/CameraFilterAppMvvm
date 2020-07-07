@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.Surface
 import android.view.SurfaceHolder
 import androidx.lifecycle.ViewModel
-import com.example.camerafilterappmvvm.imageProcess.CameraApi
+import com.example.camerafilterappmvvm.imageprocess.CameraApi
 import com.example.camerafilterappmvvm.model.CameraParams
 
 class MainViewModel : ViewModel() {

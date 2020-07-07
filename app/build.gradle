@@ -4,12 +4,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.example.camerafilterappmvvm"
         minSdkVersion 24
-        targetSdkVersion 30
+        //noinspection OldTargetApi
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
