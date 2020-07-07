@@ -8,13 +8,19 @@ import androidx.databinding.BindingAdapter
  * GLSurfaceView에서 사용할
  * 렌더러 설정 속성
  */
-@BindingAdapter("gl:setRenderer")
+@BindingAdapter("android:setRenderer")
 fun setRenderer(view: GLSurfaceView, renderer: GLSurfaceView.Renderer) = view.setRenderer(renderer)
 
 /**
  * GLSurfaceView에서 사용할
  * Surface 콜백 설정 속성
  */
-@BindingAdapter("gl:setSurfaceCallback")
+@BindingAdapter("android:setSurfaceCallback")
 fun setSurfaceCallback(view: GLSurfaceView, callback: SurfaceHolder.Callback)
         = view.holder.addCallback(callback)
+
+/**
+ * GL ES 버전 설정 속성
+ */
+@BindingAdapter("android:setEGLContextClientVersion")
+fun setEGLContextClientVersion(view: GLSurfaceView, version: Int) = view.setEGLContextClientVersion(version)

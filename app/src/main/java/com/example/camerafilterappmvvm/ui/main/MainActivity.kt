@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             // 모든 퍼미션이 허락된 상황이라면
             if (checkPermissions(this, NECESSARY_PERMISSIONS)) {
-                // 카메라를 키고 프리뷰의 뷰에 카메라 관련 콜백을 부착
-                viewModel.openCamera(this, preview_camera.holder.surface)
+                // 프리뷰의 뷰에 카메라 관련 콜백을 부착
+                cameraPreviewCallback.surfaceCreated(preview_camera.holder)
                 preview_camera.holder.addCallback(cameraPreviewCallback)
             }
             else showToast(this, "퍼미션이 거부되었습니다.")

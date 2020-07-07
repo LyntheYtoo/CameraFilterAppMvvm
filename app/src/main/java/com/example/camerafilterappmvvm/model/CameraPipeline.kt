@@ -1,4 +1,4 @@
-package com.example.camerafilterappmvvm.imageprocess
+package com.example.camerafilterappmvvm.model
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,10 +10,12 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.view.Surface
-import com.example.camerafilterappmvvm.model.CameraParams
 
-object CameraApi {
-    val TAG: String = "CameraApi"
+/**
+ * 카메라에 대한 파이프라인을 다루는 객체
+ */
+class CameraPipeline {
+    val TAG: String = "CameraPipeline"
 
     private lateinit var cameraDevice: CameraDevice
     private lateinit var cameraManager: CameraManager
@@ -51,14 +53,16 @@ object CameraApi {
             override fun onConfigured(session: CameraCaptureSession) {
                 Log.d(TAG, "Create Camera Session Success")
                 cameraCaptureSession = session
-                cameraCaptureSession.setRepeatingRequest(cameraRequest.build(), null, cameraHandler)
+                cameraCaptureSession.setRepeatingRequest(cameraRequest.build(), null,
+                    cameraHandler
+                )
             }
 
             override fun onConfigureFailed(session: CameraCaptureSession) {
                 Log.e(TAG, "Create Camera Session Fail")
             }
 
-        }, null)
+        }, cameraHandler)
     }
 
 
@@ -72,10 +76,13 @@ object CameraApi {
         cameraParams = params
 
         if (cameraHandlerThread == null) {
-            cameraHandlerThread = HandlerThread(TAG)
+            cameraHandlerThread = HandlerThread(
+                TAG
+            )
             cameraHandlerThread!!.start()
 
-            cameraHandler = Handler(cameraHandlerThread!!.looper)
+            cameraHandler = Handler(
+                cameraHandlerThread!!.looper)
         }
 
         cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -83,7 +90,7 @@ object CameraApi {
         val cameraId = cameraManager.cameraIdList[cameraParams.camPosition]
         cameraCharacter = cameraManager.getCameraCharacteristics(cameraId)
 
-        cameraManager.openCamera(cameraId, cameraStateCallback,cameraHandler)
+        cameraManager.openCamera(cameraId, cameraStateCallback, cameraHandler)
     }
 
     /**
