@@ -24,11 +24,11 @@ class MainViewModel : ViewModel() {
         ) {}
 
         override fun surfaceDestroyed(holder: SurfaceHolder?) {
-            CameraApi.closeCamera()
+            cameraApi.closeCamera()
         }
 
         override fun surfaceCreated(holder: SurfaceHolder?) {
-            CameraApi.openCamera(
+            cameraApi.openCamera(
                 context,
                 CameraParams(preview, 0)
             )
