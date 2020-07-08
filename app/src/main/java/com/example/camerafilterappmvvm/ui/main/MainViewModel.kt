@@ -75,7 +75,6 @@ class MainViewModel : ViewModel(), LifecycleObserver {
      */
     fun createImageReader(width: Int, height: Int, handler: Handler): ImageReader {
         val imgReader = ImageReader.newInstance(width, height, IMG_FORMAT, IMG_BUF_SIZE)
-        // 이미지가 들어오면 프로세스 큐에 입력하는 리스너 등록
         imgReader.setOnImageAvailableListener({
             val image = it.acquireNextImage()
             // TODO()
