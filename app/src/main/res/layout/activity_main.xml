@@ -2,9 +2,9 @@
 
 <layout>
     <data>
-        <variable
-            name="viewModel"
-            type="com.example.camerafilterappmvvm.ui.main.MainViewModel" />
+        <import type="com.example.camerafilterappmvvm.ui.main.MainViewModel"/>
+
+        <variable name="viewModel" type="MainViewModel" />
     </data>
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,6 +29,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="end|fill_vertical"
 
+            android:setSurfaceCallback="@{viewModel.cameraPreviewCallback}"
             android:setEGLContextClientVersion="@{2}"
             android:setRenderer="@{viewModel.createRenderer()}"/>
 

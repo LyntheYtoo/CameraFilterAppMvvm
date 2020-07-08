@@ -2,24 +2,20 @@ package com.example.camerafilterappmvvm.model
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
+import android.hardware.camera2.*
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import android.util.SparseIntArray
 import android.view.Surface
 
 /**
  * 카메라에 대한 파이프라인을 다루는 객체
  */
-class CameraPipeline {
-    val TAG: String = "CameraPipeline"
+class CameraApi {
+    val TAG: String = "CameraApi"
 
     private lateinit var cameraDevice: CameraDevice
-    private lateinit var cameraManager: CameraManager
-    private lateinit var cameraCaptureSession: CameraCaptureSession
     private lateinit var cameraCharacter: CameraCharacteristics
 
     private var cameraHandlerThread: HandlerThread? = null
@@ -27,35 +23,49 @@ class CameraPipeline {
 
     private lateinit var cameraParams: CameraParams
 
+    /**
+     * CameraDevice 의 콜백 객체
+     * 카메라가 열리거나, 연결해제되거나, 오류 발생시 실행되는 콜백
+     */
     private val cameraStateCallback: CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
-            createPreview()
+            createPreview(camera)
         }
 
-        override fun onDisconnected(camera: CameraDevice) { }
+        override fun onDisconnected(camera: CameraDevice) {
+            Log.d(TAG, "CameraDevice disconnected, Shut down CameraDevice")
+            camera.close()
+        }
 
-        override fun onError(camera: CameraDevice, error: Int) { }
+        override fun onError(camera: CameraDevice, error: Int) {
+            Log.e(TAG, "Error occurred on CameraDevice")
+            camera.close()
+        }
 
     }
 
     /**
      * 카메라가 보여줄 프리뷰를 생성합니다
      */
-    private fun createPreview() {
+    private fun createPreview(camera: CameraDevice) {
         val previewSurfaceArr = ArrayList<Surface>()
-        val cameraRequest = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+        val cameraRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
 
-        cameraRequest.addTarget(cameraParams.surface)
+        val sensorOrientation = cameraCharacter.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
+        val jpegOrientation =
+            (cameraParams.displayOrientation + sensorOrientation + 270) % 360
+
         previewSurfaceArr.add(cameraParams.surface)
+        cameraRequest.addTarget(cameraParams.surface)
 
-        cameraDevice.createCaptureSession(previewSurfaceArr, object : CameraCaptureSession.StateCallback() {
+//        cameraRequest.set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation)
+
+        camera.createCaptureSession(previewSurfaceArr, object : CameraCaptureSession.StateCallback() {
             override fun onConfigured(session: CameraCaptureSession) {
                 Log.d(TAG, "Create Camera Session Success")
-                cameraCaptureSession = session
-                cameraCaptureSession.setRepeatingRequest(cameraRequest.build(), null,
-                    cameraHandler
-                )
+
+                session.setRepeatingRequest(cameraRequest.build(), null, cameraHandler)
             }
 
             override fun onConfigureFailed(session: CameraCaptureSession) {
@@ -71,8 +81,6 @@ class CameraPipeline {
      */
     @SuppressLint("MissingPermission")
     fun openCamera(context: Context, params: CameraParams) {
-        Log.d(TAG, "openCamera")
-
         cameraParams = params
 
         if (cameraHandlerThread == null) {
@@ -85,26 +93,40 @@ class CameraPipeline {
                 cameraHandlerThread!!.looper)
         }
 
-        cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-
+        val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val cameraId = cameraManager.cameraIdList[cameraParams.camPosition]
         cameraCharacter = cameraManager.getCameraCharacteristics(cameraId)
 
         cameraManager.openCamera(cameraId, cameraStateCallback, cameraHandler)
+
+        Log.d(TAG, "openCamera")
     }
 
     /**
      * 카메라를 닫는 함수
      */
     fun closeCamera() {
-        Log.d(TAG, "closeCamera")
-
-        cameraCaptureSession.close()
         cameraDevice.close()
 
         if (cameraHandlerThread != null) {
             cameraHandlerThread!!.quitSafely()
             cameraHandlerThread = null
+        }
+        Log.d(TAG, "closeCamera")
+    }
+
+    companion object {
+
+        /**
+         * 화면 방향을 JPEG 방향으로 변환하는데 필요한 상수
+         */
+        private val ORIENTATIONS = SparseIntArray()
+
+        init {
+            ORIENTATIONS.append(Surface.ROTATION_0, 90)
+            ORIENTATIONS.append(Surface.ROTATION_90, 0)
+            ORIENTATIONS.append(Surface.ROTATION_180, 270)
+            ORIENTATIONS.append(Surface.ROTATION_270, 180)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.camerafilterappmvvm.ui.main
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.ImageFormat
 import android.media.ImageReader
@@ -7,18 +8,20 @@ import android.opengl.GLSurfaceView
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
-import android.view.Surface
 import android.view.SurfaceHolder
+import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.example.camerafilterappmvvm.model.CameraParams
-import com.example.camerafilterappmvvm.model.CameraPipeline
-import com.example.camerafilterappmvvm.model.GLRenderer
+import com.example.camerafilterappmvvm.model.CameraApi
+import com.example.camerafilterappmvvm.model.ImageRenderer
 
 class MainViewModel : ViewModel(), LifecycleObserver {
-    private val cameraApi = CameraPipeline()
+    val cameraPreviewCallback = ObservableField<SurfaceHolder.Callback>()
 
-    private var cameraPosition: Int = 0
+    private val cameraApi = CameraApi()
+
+    private var cameraPosition = 0
 
     private lateinit var cameraImageReader: ImageReader
     private lateinit var imageReaderHandler: Handler
@@ -27,7 +30,8 @@ class MainViewModel : ViewModel(), LifecycleObserver {
      * SurfaceView 에 등록할 카메라프리뷰 콜백을 만들어주는 함수
      * SurfaceView 가 켜지고 꺼질때 작동하는 메인로직이 담겨있다
      */
-    fun createCameraPreviewCallback(context: Context, preview: Surface) = object : SurfaceHolder.Callback {
+    fun createCameraPreviewCallback(context: Context) = object : SurfaceHolder.Callback {
+
         override fun surfaceChanged(
             holder: SurfaceHolder,
             format: Int,
@@ -36,13 +40,15 @@ class MainViewModel : ViewModel(), LifecycleObserver {
         ) {}
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
+            Log.d(TAG, "Surface Destroyed")
+
             cameraApi.closeCamera()
             cameraImageReader.close()
             imageReaderHandler.close()
         }
 
         override fun surfaceCreated(holder: SurfaceHolder) {
-            Log.d(TAG, "Surface Size : ${holder.surfaceFrame.width()}, ${holder.surfaceFrame.height()}")
+            Log.d(TAG, "Created Surface Size : ${holder.surfaceFrame.width()}, ${holder.surfaceFrame.height()}")
 
             imageReaderHandler = createHandler("ImageReader")
             cameraImageReader = createImageReader(
@@ -50,9 +56,15 @@ class MainViewModel : ViewModel(), LifecycleObserver {
                 holder.surfaceFrame.height(),
                 imageReaderHandler
             )
+
+            val displayOrientation =
+                if (context is Activity)
+                    context.windowManager.defaultDisplay.rotation
+                else 0
+
             cameraApi.openCamera(
                 context,
-                CameraParams(preview, cameraPosition)
+                CameraParams(cameraImageReader.surface, cameraPosition, IMG_FORMAT, displayOrientation)
             )
         }
     }
@@ -65,8 +77,9 @@ class MainViewModel : ViewModel(), LifecycleObserver {
         val imgReader = ImageReader.newInstance(width, height, IMG_FORMAT, IMG_BUF_SIZE)
         // 이미지가 들어오면 프로세스 큐에 입력하는 리스너 등록
         imgReader.setOnImageAvailableListener({
-            val image = it.acquireLatestImage()
-            TODO()
+            val image = it.acquireNextImage()
+            // TODO()
+            image.close()
 
         },handler)
 
@@ -93,12 +106,12 @@ class MainViewModel : ViewModel(), LifecycleObserver {
      * GLSurfaceView 에서 사용할 Renderer 생성 함수
      */
     fun createRenderer(): GLSurfaceView.Renderer {
-        return GLRenderer()
+        return ImageRenderer()
     }
 
     companion object {
         const val TAG = "MainViewModel"
-        const val IMG_FORMAT = ImageFormat.RGB_565
+        const val IMG_FORMAT = ImageFormat.YUV_420_888
         const val IMG_BUF_SIZE = 2
     }
 }

@@ -9,5 +9,9 @@ data class CameraParams(
     // 송출될 화면 서피스
     val surface: Surface,
     // 카메라 번호(전면 or 후면)
-    val camPosition: Int
+    val camPosition: Int,
+    // 카메라 이미지 출력 포맷
+    val imageFmt: Int,
+    // 화면의 방향각도
+    val displayOrientation: Int
 )
