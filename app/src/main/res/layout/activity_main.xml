@@ -30,8 +30,7 @@
             android:layout_gravity="end|fill_vertical"
 
             android:setSurfaceCallback="@{viewModel.cameraPreviewCallback}"
-            android:setEGLContextClientVersion="@{2}"
-            android:setRenderer="@{viewModel.createRenderer()}"/>
+            android:setEGLContextClientVersion="@{2}" />
 
         <!--   캡처 버튼     -->
         <Button

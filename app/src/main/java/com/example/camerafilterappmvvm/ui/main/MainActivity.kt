@@ -2,24 +2,27 @@ package com.example.camerafilterappmvvm.ui.main
 
 import android.Manifest
 import android.os.Bundle
-import android.view.SurfaceHolder
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelProvider
 import com.example.camerafilterappmvvm.R
 import com.example.camerafilterappmvvm.databinding.ActivityMainBinding
 import com.example.camerafilterappmvvm.util.askPermissions
 import com.example.camerafilterappmvvm.util.checkPermissions
 import com.example.camerafilterappmvvm.util.showToast
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
+    lateinit var lifecycleRegistry: LifecycleRegistry
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        // 커스텀 라이프사이클 오너
+        lifecycleRegistry = LifecycleRegistry(this)
 
         // 뷰모델 초기화
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -28,10 +31,8 @@ class MainActivity : AppCompatActivity() {
 
         // 퍼미션 체크
         if(checkPermissions(this, NECESSARY_PERMISSIONS))
-            // 체크가 통과되면 카메라 관련 콜백을 업데이트
-            viewModel.cameraPreviewCallback.set(
-                viewModel.createCameraPreviewCallback(this)
-            )
+            // 체크가 통과되면 콜백을 부착
+            viewModel.setCameraPreviewCallback(this)
             // 체크가 실패하면 퍼미션 요청
         else askPermissions(this, NECESSARY_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
 
@@ -60,9 +61,7 @@ class MainActivity : AppCompatActivity() {
             // 모든 퍼미션이 허락된 상황이라면
             if (checkPermissions(this, NECESSARY_PERMISSIONS)) {
                 // 카메라 관련 콜백을 업데이트
-                viewModel.cameraPreviewCallback.set(
-                    viewModel.createCameraPreviewCallback(this)
-                )
+                viewModel.setCameraPreviewCallback(this)
 
             }
             else showToast(this, "퍼미션이 거부되었습니다.")
